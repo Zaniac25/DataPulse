@@ -664,8 +664,8 @@ def data_cleaning_dashboard(display_df, working_df, df):
     duplicate_rows = int(display_df.duplicated().sum())
     
     numeric_cols = display_df.select_dtypes(include='number').columns.tolist()
-    
     outlier_columns = 0
+
     for col in numeric_cols:
         Q1 = display_df[col].quantile(0.25)
         Q3 = display_df[col].quantile(0.75)
@@ -673,6 +673,7 @@ def data_cleaning_dashboard(display_df, working_df, df):
         lower = Q1 - (1.5 * IQR)
         upper = Q3 + (1.5 * IQR)
         outliers = display_df[(display_df[col] < lower) | (display_df[col] > upper)]
+        
         if len(outliers) > 0:
             outlier_columns += 1
     
@@ -703,31 +704,41 @@ def data_cleaning_dashboard(display_df, working_df, df):
     st.divider()
     
     with st.expander("Cleaning Section", expanded=True):
-        cleaning_tab1, cleaning_tab2 = st.tabs(["Smart Auto Cleaning", "Advanced Cleaning"])
+        cleaning_tab1, cleaning_tab2 = st.tabs([
+            "Smart Auto Cleaning", 
+            "Advanced Cleaning"
+        ])
         
         with cleaning_tab1:
             with st.container(border=True):
                 st.subheader("Smart Auto Cleaning")
                 st.write("### What Smart Cleaning Will Fix")
+
                 st.markdown("""
-- Remove duplicate rows
-- Fill missing numeric values using median
-- Fill missing categorical values using mode
-- Standardize column names
-- Trim extra spaces from text columns
-- Remove empty columns
-- Remove constant columns
-- Attempt automatic datatype conversion
-""")
+                    - Remove duplicate rows
+                    - Fill missing numeric values using median
+                    - Fill missing categorical values using mode
+                    - Standardize column names
+                    - Trim extra spaces from text columns
+                    - Remove empty columns
+                    - Remove constant columns
+                    - Attempt automatic datatype conversion
+                """)
+
                 st.write("### What It Will Only Analyse")
+
                 st.markdown("""
-- Detect outlier columns
-- Detect high missing percentage columns
-- Show warnings for risky columns
-- Leave advanced manual cleaning decisions to user
-""")
+                    - Detect outlier columns
+                    - Detect high missing percentage columns
+                    - Show warnings for risky columns
+                    - Leave advanced manual cleaning decisions to user
+                """)
                 
-                if st.button("Auto Clean Dataset", use_container_width=True, type="primary"):
+                if st.button(
+                    "Auto Clean Dataset", 
+                    use_container_width=True, 
+                    type="primary"
+                ):
                     before_rows = working_df.shape[0]
                     before_missing = working_df.isnull().sum().sum()
                     auto_cleaned_df, cleaning_log, warning_log, outlier_cols = auto_clean_dataset(working_df)
@@ -743,17 +754,26 @@ def data_cleaning_dashboard(display_df, working_df, df):
                     
                     st.success("Dataset cleaned successfully.")
                     st.write("Cleaning Impact")
+
                     c1, c2 = st.columns(2)
                     with c1:
-                        st.metric("Rows Removed", before_rows - after_rows)
+                        st.metric(
+                            "Rows Removed", 
+                            before_rows - after_rows
+                        )
                     with c2:
-                        st.metric("Missing Values Fixed", before_missing - after_missing)
+                        st.metric(
+                            "Missing Values Fixed", 
+                            before_missing - after_missing
+                        )
                     
                     st.write("### Fixed Automatically")
+
                     for log in cleaning_log:
                         st.success(log)
                     
                     st.write("### Requires Manual Attention")
+
                     if warning_log:
                         for warning in warning_log:
                             st.warning(warning)
@@ -771,19 +791,37 @@ def data_cleaning_dashboard(display_df, working_df, df):
     
     st.divider()
     
-    with st.expander("Preview Section", expanded=True):
+    with st.expander(
+        "Preview Section", 
+        expanded=True
+    ):
         st.subheader("Dataset Preview")
-        preview_tab1, preview_tab2 = st.tabs(["Original Dataset", "Cleaned Dataset"])
+        preview_tab1, preview_tab2 = st.tabs([
+            "Original Dataset", 
+            "Cleaned Dataset"
+        ])
         
         with preview_tab1:
-            st.dataframe(st.session_state.original_df.head(20), use_container_width=True)
+            st.dataframe(
+                st.session_state.original_df.head(20), 
+                use_container_width=True
+            )
         
         with preview_tab2:
-            st.dataframe(st.session_state.working_df.head(20), use_container_width=True)
+            st.dataframe(
+                st.session_state.working_df.head(20), 
+                use_container_width=True
+            )
         
         if "cleaning_completed" in st.session_state and st.session_state.cleaning_completed:
             csv = st.session_state.working_df.to_csv(index=False).encode("utf-8")
-            st.download_button("Download Cleaned Dataset", csv, "cleaned_dataset.csv", "text/csv", use_container_width=True)
+            st.download_button(
+                "Download Cleaned Dataset", 
+                csv, 
+                "cleaned_dataset.csv", 
+                "text/csv", 
+                use_container_width=True
+            )
 
 def auto_clean_dataset(df):
     cleaned_df = df.copy()
