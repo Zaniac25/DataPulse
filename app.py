@@ -541,6 +541,63 @@ def dataset_quality_report(df):
             f"{duplicate_rows} duplicate rows detected."
         )
 
+def interactive_visualizations(df):
+    st.subheader("Interactive Visualizations")
+    numeric_cols = df.select_dtypes(include='number').columns.tolist()
+    if not numeric_cols:
+        st.warning("No numeric columns available for visualization.")
+        return
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        x_axis = st.selectbox("Select X-axis", df.columns.tolist(), key="viz_x_axis")
+    with col2:
+        y_axis = st.selectbox("Select Y-axis", numeric_cols, key="viz_y_axis")
+    with col3:
+        chart_type = st.selectbox("Select Chart Type", ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot"], key="viz_chart_type")
+    st.divider()
+    fig = None
+    if chart_type == "Bar Chart":
+        fig = px.bar(df, x=x_axis, y=y_axis, title=f"{y_axis} by {x_axis}", color_discrete_sequence=px.colors.qualitative.Set2)
+    elif chart_type == "Line Chart":
+        fig = px.line(df, x=x_axis, y=y_axis, title=f"{y_axis} Trend over {x_axis}", markers=True)
+    elif chart_type == "Scatter Plot":
+        fig = px.scatter(df, x=x_axis, y=y_axis, title=f"Relationship: {y_axis} vs {x_axis}", trendline="ols" if len(df) > 1 else None, opacity=0.7)
+    elif chart_type == "Histogram":
+        if x_axis not in numeric_cols:
+            st.warning(f"Histogram requires a numeric X-axis. '{x_axis}' is not numeric.")
+            return
+        fig = px.histogram(df, x=x_axis, nbins=30, title=f"Distribution of {x_axis}", color_discrete_sequence=px.colors.qualitative.Set1)
+    elif chart_type == "Box Plot":
+        fig = px.box(df, x=x_axis, y=y_axis, title=f"Distribution of {y_axis} by {x_axis}", points="outliers")
+    if fig is not None:
+        st.plotly_chart(fig, use_container_width=True)
+        if chart_type == "Scatter Plot" and len(df) > 1:
+            try:
+                correlation = df[x_axis].corr(df[y_axis])
+                if not pd.isna(correlation):
+                    st.info(f"Correlation Coefficient: {round(correlation, 3)}")
+                    if abs(correlation) > 0.7:
+                        st.success("Strong correlation detected")
+                    elif abs(correlation) > 0.3:
+                        st.info("Moderate correlation detected")
+                    else:
+                        st.warning("Weak or no correlation detected")
+            except Exception:
+                pass
+    else:
+        st.error("Could not generate the requested chart. Please check your selection.")
+
+def advanced_visualizations(df):
+    with st.expander("Advanced EDA"):
+        st.subheader("Advanced Exploratory Data Analysis")
+        adv_tab1, adv_tab2, adv_tab3 = st.tabs(["Distribution Analysis", "Outlier Detection", "Relationship Analysis"])
+        with adv_tab1:
+            distribution_analysis(df)
+        with adv_tab2:
+            outlier_analysis(df)
+        with adv_tab3:
+            relationship_analysis(df)
+
 def auto_clean_dataset(df):
     cleaned_df = df.copy()
     cleaning_log = []
@@ -1014,87 +1071,10 @@ if uploaded_file is not None:
             st.divider()
             correlation_heatmap(display_df)
             st.divider()
-
-            with st.expander("Advanced EDA"):
-                advanced_tab1, advanced_tab2, advanced_tab3 = st.tabs([
-                    "Distribution",
-                    "Outliers",
-                    "Relationships"
-                ])
-                with advanced_tab1:
-                    distribution_analysis(display_df)
-                with advanced_tab2:
-                    outlier_analysis(display_df)
-                with advanced_tab3:
-                    relationship_analysis(display_df)
+            advanced_visualizations(display_df)
 
         with tab3:
-
-            st.subheader("Interactive Visualizations")
-            # Get numeric columns
-            numeric_cols = display_df.select_dtypes(include='number').columns.tolist()
-
-            # Create two columns for controls
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                x_axis = st.selectbox(
-                    "Select X-axis",
-                    display_df.columns
-                )
-            with col2:
-                y_axis = st.selectbox(
-                    "Select Y-axis",
-                    numeric_cols
-                )
-            with col3:
-                chart_type = st.selectbox(
-                    "Chart Type",
-                    ["Bar", "Line", "Scatter", "Histogram"]
-                )
-            st.divider()
-            fig = None
-
-            # Generate chart
-            if chart_type == "Bar":
-                fig = px.bar(
-                    display_df,
-                    x=x_axis,
-                    y=y_axis,
-                    title=f"{y_axis} by {x_axis}"
-                )
-
-            elif chart_type == "Line":
-                fig = px.line(
-                    display_df,
-                    x=x_axis,
-                    y=y_axis,
-                    title=f"{y_axis} Trend"
-                )
-
-            elif chart_type == "Scatter":
-                fig = px.scatter(
-                    display_df,
-                    x=x_axis,
-                    y=y_axis,
-                    title=f"{y_axis} vs {x_axis}"
-                )
-
-            elif chart_type == "Histogram":
-                if x_axis not in numeric_cols:
-                    st.warning("Histogram requires numeric column.")
-                else:
-                    fig = px.histogram(
-                        display_df,
-                        x=x_axis,
-                        title=f"Distribution of {x_axis}"
-                    )
-
-            # Display chart
-            if fig is not None:
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
-                )
+            interactive_visualizations(display_df)
 
         with tab4:
 
