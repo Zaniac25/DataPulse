@@ -544,36 +544,91 @@ def dataset_quality_report(df):
 def interactive_visualizations(df):
     st.subheader("Interactive Visualizations")
     numeric_cols = df.select_dtypes(include='number').columns.tolist()
+
     if not numeric_cols:
         st.warning("No numeric columns available for visualization.")
         return
+    
     col1, col2, col3 = st.columns(3)
+
     with col1:
-        x_axis = st.selectbox("Select X-axis", df.columns.tolist(), key="viz_x_axis")
+        x_axis = st.selectbox(
+            "Select X-axis", 
+            df.columns.tolist(), 
+            key="viz_x_axis"
+        )
+        
     with col2:
-        y_axis = st.selectbox("Select Y-axis", numeric_cols, key="viz_y_axis")
+        y_axis = st.selectbox(
+            "Select Y-axis", 
+            numeric_cols, 
+            key="viz_y_axis"
+        )
+
     with col3:
-        chart_type = st.selectbox("Select Chart Type", ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot"], key="viz_chart_type")
+        chart_type = st.selectbox(
+            "Select Chart Type", 
+            ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot"], 
+            key="viz_chart_type"
+        )
+
     st.divider()
     fig = None
+
     if chart_type == "Bar Chart":
-        fig = px.bar(df, x=x_axis, y=y_axis, title=f"{y_axis} by {x_axis}", color_discrete_sequence=px.colors.qualitative.Set2)
+        fig = px.bar(
+            df, 
+            x=x_axis, 
+            y=y_axis, 
+            title=f"{y_axis} by {x_axis}", 
+            color_discrete_sequence=px.colors.qualitative.Set2
+        )
     elif chart_type == "Line Chart":
-        fig = px.line(df, x=x_axis, y=y_axis, title=f"{y_axis} Trend over {x_axis}", markers=True)
+        fig = px.line(
+            df, 
+            x=x_axis, 
+            y=y_axis, 
+            title=f"{y_axis} Trend over {x_axis}", 
+            markers=True
+        )
     elif chart_type == "Scatter Plot":
-        fig = px.scatter(df, x=x_axis, y=y_axis, title=f"Relationship: {y_axis} vs {x_axis}", trendline="ols" if len(df) > 1 else None, opacity=0.7)
+        fig = px.scatter(
+            df, 
+            x=x_axis, 
+            y=y_axis, 
+            title=f"Relationship: {y_axis} vs {x_axis}", 
+            trendline="ols" if len(df) > 1 else None, 
+            opacity=0.7
+        )
     elif chart_type == "Histogram":
         if x_axis not in numeric_cols:
             st.warning(f"Histogram requires a numeric X-axis. '{x_axis}' is not numeric.")
             return
-        fig = px.histogram(df, x=x_axis, nbins=30, title=f"Distribution of {x_axis}", color_discrete_sequence=px.colors.qualitative.Set1)
+        fig = px.histogram(
+            df, 
+            x=x_axis, 
+            nbins=30, 
+            title=f"Distribution of {x_axis}", 
+            color_discrete_sequence=px.colors.qualitative.Set1
+        )
     elif chart_type == "Box Plot":
-        fig = px.box(df, x=x_axis, y=y_axis, title=f"Distribution of {y_axis} by {x_axis}", points="outliers")
+        fig = px.box(
+            df, 
+            x=x_axis, 
+            y=y_axis, 
+            title=f"Distribution of {y_axis} by {x_axis}", 
+            points="outliers"
+        )
+
     if fig is not None:
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(
+            fig, 
+            use_container_width=True
+        )
         if chart_type == "Scatter Plot" and len(df) > 1:
             try:
                 correlation = df[x_axis].corr(df[y_axis])
+
                 if not pd.isna(correlation):
                     st.info(f"Correlation Coefficient: {round(correlation, 3)}")
                     if abs(correlation) > 0.7:
@@ -590,7 +645,11 @@ def interactive_visualizations(df):
 def advanced_visualizations(df):
     with st.expander("Advanced EDA"):
         st.subheader("Advanced Exploratory Data Analysis")
-        adv_tab1, adv_tab2, adv_tab3 = st.tabs(["Distribution Analysis", "Outlier Detection", "Relationship Analysis"])
+        adv_tab1, adv_tab2, adv_tab3 = st.tabs([
+            "Distribution Analysis", 
+            "Outlier Detection", 
+            "Relationship Analysis"
+        ])
         with adv_tab1:
             distribution_analysis(df)
         with adv_tab2:
