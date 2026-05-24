@@ -866,6 +866,18 @@ def data_cleaning_dashboard(display_df, working_df, df):
     ):
         preview_section_ui()
 
+def standardize_column_names(df, cleaning_log):
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+    cleaning_log.append("Standardized column names.")
+    return df, cleaning_log
+
+def remove_duplicate_rows(df, cleaning_log):
+    duplicate_count = df.duplicated().sum()
+    if duplicate_count > 0:
+        df = df.drop_duplicates()
+        cleaning_log.append(f"Removed {duplicate_count} duplicate rows.")
+    return df, cleaning_log
+
 def auto_clean_dataset(df):
     cleaned_df = df.copy()
     cleaning_log = []
