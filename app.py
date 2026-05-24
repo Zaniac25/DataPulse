@@ -906,7 +906,14 @@ def auto_convert_datatypes(df, cleaning_log):
     cleaning_log.append("Attempted automatic datatype conversion.")
     return df, cleaning_log
 
-def handle_missing_values_numeric(df, col, cleaning_log, warning_log, missing_count, missing_percent):
+def handle_missing_values_numeric(
+        df, 
+        col, 
+        cleaning_log, 
+        warning_log, 
+        missing_count, 
+        missing_percent
+):
     if missing_percent > 40:
         warning_log.append(f"'{col}' has high missing values ({missing_percent:.1f}%).")
     median_value = df[col].median()
@@ -963,7 +970,11 @@ def auto_clean_dataset(df):
             
             if pd.api.types.is_numeric_dtype(cleaned_df[col]):
                 cleaned_df, cleaning_log, warning_log = handle_missing_values_numeric(
-                    cleaned_df, col, cleaning_log, warning_log, missing_count, missing_percent
+                    cleaned_df, 
+                    col, cleaning_log, 
+                    warning_log, 
+                    missing_count, 
+                    missing_percent
                 )
             else:
                 cleaned_df, cleaning_log = handle_missing_values_categorical(cleaned_df, col, cleaning_log)
