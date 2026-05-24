@@ -866,6 +866,8 @@ def data_cleaning_dashboard(display_df, working_df, df):
     ):
         preview_section_ui()
 
+# Auto Cleaning Functions
+
 def standardize_column_names(df, cleaning_log):
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
     cleaning_log.append("Standardized column names.")
@@ -940,161 +942,35 @@ def detect_outlier_columns(df):
             outlier_cols.append(col)
     return outlier_cols
 
+# Auto cleaning main function
+
 def auto_clean_dataset(df):
     cleaned_df = df.copy()
     cleaning_log = []
     warning_log = []
-
-    # Standardize Column Names
-    cleaned_df.columns = (
-        cleaned_df.columns
-        .str.strip()
-        .str.lower()
-        .str.replace(" ", "_")
-    )
-    cleaning_log.append(
-        "Standardized column names."
-    )
-
-    # Remove Duplicate Rows
-    duplicate_count = cleaned_df.duplicated().sum()
-    if duplicate_count > 0:
-        cleaned_df = cleaned_df.drop_duplicates()
-        cleaning_log.append(
-            f"Removed {duplicate_count} duplicate rows."
-        )
-
-    # Remove Fully Empty Columns
-    empty_cols = cleaned_df.columns[
-        cleaned_df.isnull().all()
-    ].tolist()
-
-    if empty_cols:
-        cleaned_df = cleaned_df.drop(
-            columns=empty_cols
-        )
-        cleaning_log.append(
-            f"Removed {len(empty_cols)} empty columns."
-        )
-
-    # Remove Constant Columns
-    constant_cols = []
+    
+    cleaned_df, cleaning_log = standardize_column_names(cleaned_df, cleaning_log)
+    cleaned_df, cleaning_log = remove_duplicate_rows(cleaned_df, cleaning_log)
+    cleaned_df, cleaning_log = remove_empty_columns(cleaned_df, cleaning_log)
+    cleaned_df, cleaning_log = remove_constant_columns(cleaned_df, cleaning_log)
+    cleaned_df, cleaning_log = auto_convert_datatypes(cleaned_df, cleaning_log)
+    
+    # Handle missing values
     for col in cleaned_df.columns:
-        if cleaned_df[col].nunique() <= 1:
-            constant_cols.append(col)
-
-    if constant_cols:
-        cleaned_df = cleaned_df.drop(
-            columns=constant_cols
-        )
-        cleaning_log.append(
-            f"Removed {len(constant_cols)} constant columns."
-        )
-
-    # Auto Datatype Conversion
-    for col in cleaned_df.columns:
-        try:
-            cleaned_df[col] = pd.to_numeric(
-                cleaned_df[col],
-                errors="ignore"
-            )
-        except:
-            pass
-
-    cleaning_log.append(
-        "Attempted automatic datatype conversion."
-    )
-
-    # Handle Missing Values
-    for col in cleaned_df.columns:
-        missing_count = (
-            cleaned_df[col]
-            .isnull()
-            .sum()
-        )
+        missing_count = cleaned_df[col].isnull().sum()
         if missing_count > 0:
-            missing_percent = (
-                missing_count / len(cleaned_df)
-            ) * 100
-
-            # High Missing Warning
-            if missing_percent > 40:
-                warning_log.append(
-                    f"'{col}' has high missing values ({missing_percent:.1f}%)."
+            missing_percent = (missing_count / len(cleaned_df)) * 100
+            
+            if pd.api.types.is_numeric_dtype(cleaned_df[col]):
+                cleaned_df, cleaning_log, warning_log = handle_missing_values_numeric(
+                    cleaned_df, col, cleaning_log, warning_log, missing_count, missing_percent
                 )
-
-            # Numeric
-            if pd.api.types.is_numeric_dtype(
-                cleaned_df[col]
-            ):
-
-                median_value = (
-                    cleaned_df[col]
-                    .median()
-                )
-
-                cleaned_df[col] = (
-                    cleaned_df[col]
-                    .fillna(median_value)
-                )
-
-                cleaning_log.append(
-                    f"Filled missing values in '{col}' using median."
-                )
-
-            # Categorical
             else:
-                mode_series = cleaned_df[col].mode()
-
-                if not mode_series.empty:
-                    mode_value = mode_series[0]
-                else:
-                    mode_value = "Unknown"
-
-                cleaned_df[col] = (
-                    cleaned_df[col]
-                    .fillna(mode_value)
-                )
-
-                cleaning_log.append(
-                    f"Filled missing values in '{col}' using mode."
-                )
-
-    # Trim Spaces
-    object_cols = cleaned_df.select_dtypes(
-        include='object'
-    ).columns.tolist()
-
-    for col in object_cols:
-        cleaned_df[col] = (
-            cleaned_df[col]
-            .astype(str)
-            .str.strip()
-        )
-    cleaning_log.append(
-        "Trimmed extra spaces from text columns."
-    )
-
-    # Outlier Detection
-    numeric_cols = cleaned_df.select_dtypes(
-        include='number'
-    ).columns.tolist()
-    outlier_cols = []
-
-    for col in numeric_cols:
-        Q1 = cleaned_df[col].quantile(0.25)
-        Q3 = cleaned_df[col].quantile(0.75)
-
-        IQR = Q3 - Q1
-        lower = Q1 - (1.5 * IQR)
-        upper = Q3 + (1.5 * IQR)
-        outliers = cleaned_df[
-            (cleaned_df[col] < lower) |
-            (cleaned_df[col] > upper)
-        ]
-        if len(outliers) > 0:
-            outlier_cols.append(col)
-
+                cleaned_df, cleaning_log = handle_missing_values_categorical(cleaned_df, col, cleaning_log)
+    
+    cleaned_df, cleaning_log = trim_text_columns(cleaned_df, cleaning_log)
+    outlier_cols = detect_outlier_columns(cleaned_df)
+    
     return cleaned_df, cleaning_log, warning_log, outlier_cols
 
 def data_cleaning_module(df):
