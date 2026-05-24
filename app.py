@@ -878,6 +878,23 @@ def remove_duplicate_rows(df, cleaning_log):
         cleaning_log.append(f"Removed {duplicate_count} duplicate rows.")
     return df, cleaning_log
 
+def remove_empty_columns(df, cleaning_log):
+    empty_cols = df.columns[df.isnull().all()].tolist()
+    if empty_cols:
+        df = df.drop(columns=empty_cols)
+        cleaning_log.append(f"Removed {len(empty_cols)} empty columns.")
+    return df, cleaning_log
+
+def remove_constant_columns(df, cleaning_log):
+    constant_cols = []
+    for col in df.columns:
+        if df[col].nunique() <= 1:
+            constant_cols.append(col)
+    if constant_cols:
+        df = df.drop(columns=constant_cols)
+        cleaning_log.append(f"Removed {len(constant_cols)} constant columns.")
+    return df, cleaning_log
+
 def auto_clean_dataset(df):
     cleaned_df = df.copy()
     cleaning_log = []
