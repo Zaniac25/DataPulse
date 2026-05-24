@@ -895,6 +895,23 @@ def remove_constant_columns(df, cleaning_log):
         cleaning_log.append(f"Removed {len(constant_cols)} constant columns.")
     return df, cleaning_log
 
+def auto_convert_datatypes(df, cleaning_log):
+    for col in df.columns:
+        try:
+            df[col] = pd.to_numeric(df[col], errors="ignore")
+        except:
+            pass
+    cleaning_log.append("Attempted automatic datatype conversion.")
+    return df, cleaning_log
+
+def handle_missing_values_numeric(df, col, cleaning_log, warning_log, missing_count, missing_percent):
+    if missing_percent > 40:
+        warning_log.append(f"'{col}' has high missing values ({missing_percent:.1f}%).")
+    median_value = df[col].median()
+    df[col] = df[col].fillna(median_value)
+    cleaning_log.append(f"Filled missing values in '{col}' using median.")
+    return df, cleaning_log, warning_log
+
 def auto_clean_dataset(df):
     cleaned_df = df.copy()
     cleaning_log = []
