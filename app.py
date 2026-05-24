@@ -912,6 +912,34 @@ def handle_missing_values_numeric(df, col, cleaning_log, warning_log, missing_co
     cleaning_log.append(f"Filled missing values in '{col}' using median.")
     return df, cleaning_log, warning_log
 
+def handle_missing_values_categorical(df, col, cleaning_log):
+    mode_series = df[col].mode()
+    mode_value = mode_series[0] if not mode_series.empty else "Unknown"
+    df[col] = df[col].fillna(mode_value)
+    cleaning_log.append(f"Filled missing values in '{col}' using mode.")
+    return df, cleaning_log
+
+def trim_text_columns(df, cleaning_log):
+    object_cols = df.select_dtypes(include='object').columns.tolist()
+    for col in object_cols:
+        df[col] = df[col].astype(str).str.strip()
+    cleaning_log.append("Trimmed extra spaces from text columns.")
+    return df, cleaning_log
+
+def detect_outlier_columns(df):
+    numeric_cols = df.select_dtypes(include='number').columns.tolist()
+    outlier_cols = []
+    for col in numeric_cols:
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower = Q1 - (1.5 * IQR)
+        upper = Q3 + (1.5 * IQR)
+        outliers = df[(df[col] < lower) | (df[col] > upper)]
+        if len(outliers) > 0:
+            outlier_cols.append(col)
+    return outlier_cols
+
 def auto_clean_dataset(df):
     cleaned_df = df.copy()
     cleaning_log = []
