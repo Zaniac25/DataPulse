@@ -664,8 +664,8 @@ def display_dataset_metrics(display_df, df):
     duplicate_rows = int(display_df.duplicated().sum())
     
     numeric_cols = display_df.select_dtypes(include='number').columns.tolist()
-    
     outlier_columns = 0
+
     for col in numeric_cols:
         Q1 = display_df[col].quantile(0.25)
         Q3 = display_df[col].quantile(0.75)
@@ -677,16 +677,38 @@ def display_dataset_metrics(display_df, df):
             outlier_columns += 1
     
     empty_columns = int(df.columns[df.isnull().all()].shape[0])
-    
+
     col1, col2, col3 = st.columns(3)
-    col1.metric("Rows", display_df.shape[0])
-    col2.metric("Columns", display_df.shape[1])
-    col3.metric("Missing Values", total_missing)
+    col1.metric(
+        "Rows", 
+        display_df.shape[0]
+    )
+
+    col2.metric(
+        "Columns", 
+        display_df.shape[1]
+    )
+
+    col3.metric(
+        "Missing Values", 
+        total_missing
+    )
     
     col4, col5, col6 = st.columns(3)
-    col4.metric("Duplicate Rows", duplicate_rows)
-    col5.metric("Outlier Columns", outlier_columns)
-    col6.metric("Empty Columns", empty_columns)
+    col4.metric(
+        "Duplicate Rows", 
+        duplicate_rows
+    )
+    
+    col5.metric(
+        "Outlier Columns", 
+        outlier_columns
+    )
+
+    col6.metric(
+        "Empty Columns", 
+        empty_columns
+    )
     
     return total_missing, duplicate_rows, outlier_columns
 
@@ -707,24 +729,26 @@ def smart_auto_cleaning_ui(working_df):
         st.subheader("Smart Auto Cleaning")
         
         st.write("### What Smart Cleaning Will Fix")
+
         st.markdown("""
-- Remove duplicate rows
-- Fill missing numeric values using median
-- Fill missing categorical values using mode
-- Standardize column names
-- Trim extra spaces from text columns
-- Remove empty columns
-- Remove constant columns
-- Attempt automatic datatype conversion
-""")
+            - Remove duplicate rows
+            - Fill missing numeric values using median
+            - Fill missing categorical values using mode
+            - Standardize column names
+            - Trim extra spaces from text columns
+            - Remove empty columns
+            - Remove constant columns
+            - Attempt automatic datatype conversion
+        """)
         
         st.write("### What It Will Only Analyse")
+
         st.markdown("""
-- Detect outlier columns
-- Detect high missing percentage columns
-- Show warnings for risky columns
-- Leave advanced manual cleaning decisions to user
-""")
+            - Detect outlier columns
+            - Detect high missing percentage columns
+            - Show warnings for risky columns
+            - Leave advanced manual cleaning decisions to user
+        """)
         
         if st.button("Auto Clean Dataset", use_container_width=True, type="primary"):
             before_rows = working_df.shape[0]
@@ -742,13 +766,20 @@ def smart_auto_cleaning_ui(working_df):
             after_missing = auto_cleaned_df.isnull().sum().sum()
             
             st.success("Dataset cleaned successfully.")
-            
+
             st.write("Cleaning Impact")
             c1, c2 = st.columns(2)
             with c1:
-                st.metric("Rows Removed", before_rows - after_rows)
+                st.metric(
+                    "Rows Removed", 
+                    before_rows - after_rows
+                )
+
             with c2:
-                st.metric("Missing Values Fixed", before_missing - after_missing)
+                st.metric(
+                    "Missing Values Fixed", 
+                    before_missing - after_missing
+                )
             
             st.write("### Fixed Automatically")
             for log in cleaning_log:
@@ -772,17 +803,32 @@ def advanced_cleaning_ui():
 
 def preview_section_ui():
     st.subheader("Dataset Preview")
-    preview_tab1, preview_tab2 = st.tabs(["Original Dataset", "Cleaned Dataset"])
+    preview_tab1, preview_tab2 = st.tabs([
+        "Original Dataset", 
+        "Cleaned Dataset"
+    ])
     
     with preview_tab1:
-        st.dataframe(st.session_state.original_df.head(20), use_container_width=True)
+        st.dataframe(
+            st.session_state.original_df.head(20), 
+            use_container_width=True
+        )
     
     with preview_tab2:
-        st.dataframe(st.session_state.working_df.head(20), use_container_width=True)
+        st.dataframe(
+            st.session_state.working_df.head(20), 
+            use_container_width=True
+        )
     
     if "cleaning_completed" in st.session_state and st.session_state.cleaning_completed:
         csv = st.session_state.working_df.to_csv(index=False).encode("utf-8")
-        st.download_button("Download Cleaned Dataset", csv, "cleaned_dataset.csv", "text/csv", use_container_width=True)
+        st.download_button(
+            "Download Cleaned Dataset", 
+            csv, 
+            "cleaned_dataset.csv", 
+            "text/csv", 
+            use_container_width=True
+        )
 
 # main data cleaning dashboard function
 
@@ -797,8 +843,14 @@ def data_cleaning_dashboard(display_df, working_df, df):
     
     st.divider()
     
-    with st.expander("Cleaning Section", expanded=True):
-        cleaning_tab1, cleaning_tab2 = st.tabs(["Smart Auto Cleaning", "Advanced Cleaning"])
+    with st.expander(
+        "Cleaning Section", 
+        expanded=True
+    ):
+        cleaning_tab1, cleaning_tab2 = st.tabs([
+            "Smart Auto Cleaning", 
+            "Advanced Cleaning"
+        ])
         
         with cleaning_tab1:
             smart_auto_cleaning_ui(working_df)
@@ -808,7 +860,10 @@ def data_cleaning_dashboard(display_df, working_df, df):
     
     st.divider()
     
-    with st.expander("Preview Section", expanded=True):
+    with st.expander(
+        "Preview Section", 
+        expanded=True
+    ):
         preview_section_ui()
 
 def auto_clean_dataset(df):
