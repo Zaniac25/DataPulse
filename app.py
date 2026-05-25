@@ -586,7 +586,7 @@ def advanced_visualizations(df):
 
 # Data Cleaning Dashboard Functions
 
-def display_dataset_metrics(display_df, df):
+def display_dataset_metrics(display_df):
     total_missing = int(display_df.isnull().sum().sum())
     duplicate_rows = int(display_df.duplicated().sum())
     
@@ -603,7 +603,7 @@ def display_dataset_metrics(display_df, df):
         if len(outliers) > 0:
             outlier_columns += 1
     
-    empty_columns = int(df.columns[df.isnull().all()].shape[0])
+    empty_columns = int(display_df.columns[display_df.isnull().all()].shape[0])
 
     col1, col2, col3 = st.columns(3)
     col1.metric(
@@ -762,7 +762,7 @@ def preview_section_ui():
 def data_cleaning_dashboard(display_df, working_df, df):
     st.subheader("Data Cleaning Dashboard")
     
-    total_missing, duplicate_rows, outlier_columns = display_dataset_metrics(display_df, df)
+    total_missing, duplicate_rows, outlier_columns = display_dataset_metrics(display_df)
     
     st.divider()
     
