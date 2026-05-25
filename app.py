@@ -479,30 +479,52 @@ def interactive_visualizations(df):
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        x_axis = st.selectbox(
-            "Select X-axis", 
-            df.columns.tolist(), 
-            key="viz_x_axis"
+        chart_type = st.selectbox(
+            "Select Chart Type", 
+            ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot", "Pie Chart"], 
+            key="viz_chart_type"
         )
         
     with col2:
-        y_axis = st.selectbox(
-            "Select Y-axis", 
-            numeric_cols, 
-            key="viz_y_axis"
-        )
+        if chart_type == "Pie Chart":
+            pie_col = st.selectbox(
+                "Select Column for Pie Chart",
+                df.columns.tolist(),
+                key="pie_col"
+            )
+        else:
+            x_axis = st.selectbox(
+                "Select X-axis", 
+                df.columns.tolist(), 
+                key="viz_x_axis"
+            )
 
     with col3:
-        chart_type = st.selectbox(
-            "Select Chart Type", 
-            ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot"], 
-            key="viz_chart_type"
-        )
+        if chart_type == "Pie Chart":
+            st.write(" ")  # Empty placeholder for alignment
+        else:
+            y_axis = st.selectbox(
+                "Select Y-axis", 
+                numeric_cols, 
+                key="viz_y_axis"
+            )
 
     st.divider()
     fig = None
 
-    if chart_type == "Bar Chart":
+    if chart_type == "Pie Chart":
+        value_counts = df[pie_col].value_counts().reset_index()
+        value_counts.columns = [pie_col, "count"]
+        fig = px.pie(
+            value_counts,
+            names=pie_col,
+            values="count",
+            title=f"Distribution of {pie_col}",
+            hole=0.3,
+            color_discrete_sequence=px.colors.qualitative.Set3
+        )
+
+    elif chart_type == "Bar Chart":
         fig = px.bar(
             df, 
             x=x_axis, 
