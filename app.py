@@ -1,6 +1,11 @@
 import streamlit as st
 from data_loader import load_data, initialize_session_state
-from ui_components import sidebar_controls, sidebar_filters, data_cleaning_dashboard, dataset_preview
+from ui_components import (
+    sidebar_controls, 
+    sidebar_filters, 
+    data_cleaning_dashboard, 
+    dataset_preview
+)
 from analysis import (
     dataset_shape, show_columns, show_datatypes, show_dataset_info,
     statistic_summary, show_missing_values, correlation_heatmap
@@ -8,7 +13,11 @@ from analysis import (
 from visualizations import interactive_visualizations, advanced_visualizations
 
 # Page configuration
-st.set_page_config(page_title="Accidents Analysis Dashboard", page_icon="🎀", layout="wide")
+st.set_page_config(
+    page_title="Accidents Analysis Dashboard", 
+    page_icon="🎀", 
+    layout="wide"
+)
 
 # Title
 st.title("Accidents Analysis Dashboard")
@@ -37,7 +46,12 @@ if uploaded_file is not None:
         st.success("Uploaded Successfully")
         
         # Tabs
-        tab1, tab2, tab3, tab4 = st.tabs(["Overview", "EDA", "Visualizations", "Data Cleaning"])
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "Overview", 
+            "EDA", 
+            "Visualizations", 
+            "Data Cleaning"
+        ])
         
         with tab1:
             dataset_shape(display_df)
