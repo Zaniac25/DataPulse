@@ -51,7 +51,7 @@ def handle_missing_values_numeric(
         warning_log, 
         missing_count, 
         missing_percent
-):
+    ):
     if missing_percent > 40:
         warning_log.append(f"'{col}' has high missing values ({missing_percent:.1f}%).")
 
@@ -64,7 +64,7 @@ def handle_missing_values_categorical(
         df, 
         col, 
         cleaning_log
-):
+    ):
     mode_series = df[col].mode()
     mode_value = mode_series[0] if not mode_series.empty else "Unknown"
     df[col] = df[col].fillna(mode_value)

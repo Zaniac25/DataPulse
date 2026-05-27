@@ -3,11 +3,9 @@ import streamlit as st
 
 @st.cache_data
 def load_data(uploaded_file):
-    """Load and cache CSV data"""
     return pd.read_csv(uploaded_file, low_memory=False)
 
 def initialize_session_state(df, file_name):
-    """Initialize all session state variables"""
     if "original_df" not in st.session_state:
         st.session_state.original_df = df.copy()
     

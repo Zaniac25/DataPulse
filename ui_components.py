@@ -4,7 +4,6 @@ from cleaning import auto_clean_dataset, data_cleaning_module
 from utils import detect_outlier_columns
 
 def sidebar_controls():
-    """Create sidebar with file uploader"""
     with st.sidebar:
         st.header("Dashboard Controls")
         st.write("Upload dataset to begin analysis")
@@ -12,17 +11,16 @@ def sidebar_controls():
     return uploaded_file
 
 def dataset_preview(df):
-    """Display dataset preview"""
     st.subheader("Dataset Preview")
     st.dataframe(df.head(20), use_container_width=True, height=400)
 
 def display_dataset_metrics(display_df):
-    """Display dataset quality metrics"""
     total_missing = int(display_df.isnull().sum().sum())
     duplicate_rows = int(display_df.duplicated().sum())
     
     numeric_cols = display_df.select_dtypes(include='number').columns.tolist()
     outlier_columns = 0
+
     for col in numeric_cols:
         Q1 = display_df[col].quantile(0.25)
         Q3 = display_df[col].quantile(0.75)
@@ -30,6 +28,7 @@ def display_dataset_metrics(display_df):
         lower = Q1 - (1.5 * IQR)
         upper = Q3 + (1.5 * IQR)
         outliers = display_df[(display_df[col] < lower) | (display_df[col] > upper)]
+
         if len(outliers) > 0:
             outlier_columns += 1
     
@@ -47,8 +46,12 @@ def display_dataset_metrics(display_df):
     
     return total_missing, duplicate_rows, outlier_columns
 
-def display_health_score(display_df, total_missing, duplicate_rows, outlier_columns):
-    """Display dataset health score"""
+def display_health_score(
+        display_df, 
+        total_missing, 
+        duplicate_rows, 
+        outlier_columns
+    ):
     st.subheader("Dataset Health Score")
     health_score = 100
     health_score -= min(int(total_missing / max(len(display_df), 1) * 100), 40)
@@ -59,7 +62,6 @@ def display_health_score(display_df, total_missing, duplicate_rows, outlier_colu
     st.metric("Health Score", f"{health_score}%")
 
 def smart_auto_cleaning_ui(working_df):
-    """Smart auto cleaning UI component"""
     with st.container(border=True):
         st.subheader("Smart Auto Cleaning")
         st.write("### What Smart Cleaning Will Fix")
@@ -121,12 +123,10 @@ def smart_auto_cleaning_ui(working_df):
                 st.success("No significant outliers detected.")
 
 def advanced_cleaning_ui():
-    """Advanced cleaning UI component"""
     st.subheader("Advanced Cleaning")
     cleaned_df = data_cleaning_module(st.session_state.working_df)
 
 def preview_section_ui():
-    """Preview section with original and cleaned data"""
     st.subheader("Dataset Preview")
     preview_tab1, preview_tab2 = st.tabs(["Original Dataset", "Cleaned Dataset"])
     with preview_tab1:
@@ -136,15 +136,24 @@ def preview_section_ui():
     
     if "cleaning_completed" in st.session_state and st.session_state.cleaning_completed:
         csv = st.session_state.working_df.to_csv(index=False).encode("utf-8")
-        st.download_button("Download Cleaned Dataset", csv, "cleaned_dataset.csv", 
-                          "text/csv", use_container_width=True)
+        st.download_button(
+            "Download Cleaned Dataset", 
+            csv, 
+            "cleaned_dataset.csv", 
+            "text/csv", 
+            use_container_width=True
+        )
 
 def data_cleaning_dashboard(display_df, working_df, df):
-    """Main data cleaning dashboard"""
     st.subheader("Data Cleaning Dashboard")
     total_missing, duplicate_rows, outlier_columns = display_dataset_metrics(display_df)
     st.divider()
-    display_health_score(display_df, total_missing, duplicate_rows, outlier_columns)
+    display_health_score(
+        display_df, 
+        total_missing, 
+        duplicate_rows,
+        outlier_columns
+    )
     st.divider()
     
     with st.expander("Cleaning Section", expanded=True):
@@ -159,11 +168,11 @@ def data_cleaning_dashboard(display_df, working_df, df):
         preview_section_ui()
 
 def sidebar_filters(df):
-    """Create sidebar filters for categorical columns"""
     st.sidebar.divider()
     st.sidebar.subheader("Dataset Filters")
     
     categorical_cols = df.select_dtypes(include='object').columns.tolist()
+    
     if categorical_cols:
         filter_column = st.sidebar.selectbox("Select Column", ["None"] + categorical_cols)
         if filter_column != "None" and filter_column in df.columns:
