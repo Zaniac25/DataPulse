@@ -11,6 +11,7 @@ from analysis import (
     statistic_summary, show_missing_values, correlation_heatmap
 )
 from visualizations import interactive_visualizations, advanced_visualizations
+from profiling import generate_dataset_profile
 
 # Page configuration
 st.set_page_config(
@@ -30,6 +31,12 @@ if uploaded_file is not None:
     try:
         # Load data
         df = load_data(uploaded_file)
+
+        # Generate Dataset Profile
+        profile = generate_dataset_profile(df)
+
+        # Store Profile
+        st.session_state.dataset_profile = profile
         
         # Initialize session state
         initialize_session_state(df, uploaded_file.name)
@@ -55,6 +62,12 @@ if uploaded_file is not None:
         
         with tab1:
             dataset_shape(display_df)
+
+            with st.expander("Dataset Profile Debug"):
+                st.json(
+                    st.session_state.dataset_profile
+                )
+
             st.divider()
             dataset_preview(display_df)
             st.divider()
