@@ -7,7 +7,7 @@ def sidebar_controls():
     with st.sidebar:
         st.header("Dashboard Controls")
         st.write("Upload dataset to begin analysis")
-        uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
+        uploaded_file = st.file_uploader("Upload File", type=["csv","xlsx","json"])
     return uploaded_file
 
 def dataset_preview(df):
