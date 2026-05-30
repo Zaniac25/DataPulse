@@ -12,14 +12,7 @@ from analysis import (
 )
 from visualizations import interactive_visualizations, advanced_visualizations
 from profiling import generate_dataset_profile
-
-# Page configuration
-st.set_page_config(
-    page_title="Accidents Analysis Dashboard", 
-    page_icon="🎀", 
-    layout="wide"
-)
-
+from insights import generate_dataset_insights
 # Title
 st.title("Accidents Analysis Dashboard")
 
@@ -37,6 +30,14 @@ if uploaded_file is not None:
 
         # Store Profile
         st.session_state.dataset_profile = profile
+
+        # Generate Dataset Insights
+        insights = generate_dataset_insights(
+            profile
+        )
+
+        # Store Insights
+        st.session_state.dataset_insights = insights
         
         # Initialize session state
         initialize_session_state(df, uploaded_file.name)
@@ -67,6 +68,10 @@ if uploaded_file is not None:
                 st.json(
                     st.session_state.dataset_profile
                 )
+
+            st.subheader("Dataset Insights")
+            for insight in st.session_state.dataset_insights:
+                st.info(insight)
 
             st.divider()
             dataset_preview(display_df)
