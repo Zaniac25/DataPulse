@@ -13,6 +13,8 @@ from analysis import (
 from visualizations import interactive_visualizations, advanced_visualizations
 from profiling import generate_dataset_profile
 from insights import generate_dataset_insights
+from report_generator import generate_eda_report
+
 # Title
 st.title("Accidents Analysis Dashboard")
 
@@ -38,6 +40,15 @@ if uploaded_file is not None:
 
         # Store Insights
         st.session_state.dataset_insights = insights
+
+        # Generate EDA Report
+        eda_report = generate_eda_report(
+            profile,
+            insights
+        )
+
+        # Store Report
+        st.session_state.eda_report = eda_report
         
         # Initialize session state
         initialize_session_state(df, uploaded_file.name)
@@ -72,6 +83,17 @@ if uploaded_file is not None:
             st.subheader("Dataset Insights")
             for insight in st.session_state.dataset_insights:
                 st.info(insight)
+
+            with st.expander(
+                "Generated EDA Report"
+            ):
+
+                for section, content in (
+                    st.session_state.eda_report.items()
+                ):
+
+                    st.write(f"## {section}")
+                    st.text(content)
 
             st.divider()
             dataset_preview(display_df)
