@@ -14,6 +14,7 @@ from visualizations import interactive_visualizations, advanced_visualizations
 from profiling import generate_dataset_profile
 from insights import generate_dataset_insights
 from report_generator import generate_eda_report
+from report_export import export_eda_report_pdf
 
 # Title
 st.title("Accidents Analysis Dashboard")
@@ -94,6 +95,26 @@ if uploaded_file is not None:
 
                     st.write(f"## {section}")
                     st.text(content)
+
+                if st.button(
+                    "Generate PDF Report"
+                ):
+
+                    pdf_path = export_eda_report_pdf(
+                        st.session_state.eda_report
+                    )
+
+                    with open(
+                        pdf_path,
+                        "rb"
+                    ) as pdf_file:
+
+                        st.download_button(
+                            label="Download PDF",
+                            data=pdf_file,
+                            file_name="EDA_Report.pdf",
+                            mime="application/pdf"
+                        )
 
             st.divider()
             dataset_preview(display_df)
