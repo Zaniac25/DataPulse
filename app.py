@@ -66,11 +66,12 @@ if uploaded_file is not None:
         st.success("Uploaded Successfully")
         
         # Tabs
-        tab1, tab2, tab3, tab4 = st.tabs([
+        tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "Overview", 
             "EDA", 
             "Visualizations", 
-            "Data Cleaning"
+            "Data Cleaning",
+            "Reports"
         ])
         
         with tab1:
@@ -141,6 +142,30 @@ if uploaded_file is not None:
         
         with tab4:
             data_cleaning_dashboard(display_df, working_df, df)
+
+        with tab5:
+            st.header("Report Center")
+
+            profile = st.session_state.dataset_profile
+            st.subheader("Dataset Summary")
+            col1, col2, col3 = st.columns(3)
+
+            col1.metric(
+                "Rows",
+                profile["rows"]
+            )
+            col2.metric(
+                "Columns",
+                profile["columns"]
+            )
+            col3.metric(
+                "Duplicates",
+                profile["duplicate_rows"]
+            )
+
+            st.subheader("Generated Insights")
+            for insight in st.session_state.dataset_insights:
+                st.info(insight)
     
     except Exception as e:
         st.error(f"Error while reading file: {e}")
