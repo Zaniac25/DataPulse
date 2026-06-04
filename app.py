@@ -82,41 +82,6 @@ if uploaded_file is not None:
                     st.session_state.dataset_profile
                 )
 
-            st.subheader("Dataset Insights")
-            for insight in st.session_state.dataset_insights:
-                st.info(insight)
-
-            with st.expander(
-                "Generated EDA Report"
-            ):
-
-                for section, content in (
-                    st.session_state.eda_report.items()
-                ):
-
-                    st.write(f"## {section}")
-                    st.text(content)
-
-                if st.button(
-                    "Generate PDF Report"
-                ):
-
-                    pdf_path = export_eda_report_pdf(
-                        st.session_state.eda_report
-                    )
-
-                    with open(
-                        pdf_path,
-                        "rb"
-                    ) as pdf_file:
-
-                        st.download_button(
-                            label="Download PDF",
-                            data=pdf_file,
-                            file_name="EDA_Report.pdf",
-                            mime="application/pdf"
-                        )
-
             st.divider()
             dataset_preview(display_df)
             st.divider()
@@ -166,6 +131,37 @@ if uploaded_file is not None:
             st.subheader("Generated Insights")
             for insight in st.session_state.dataset_insights:
                 st.info(insight)
+
+            with st.expander(
+                "Generated EDA Report"
+            ):
+
+                for section, content in (
+                    st.session_state.eda_report.items()
+                ):
+
+                    st.write(f"## {section}")
+                    st.text(content)
+
+                if st.button(
+                    "Generate PDF Report"
+                ):
+
+                    pdf_path = export_eda_report_pdf(
+                        st.session_state.eda_report
+                    )
+
+                    with open(
+                        pdf_path,
+                        "rb"
+                    ) as pdf_file:
+
+                        st.download_button(
+                            label="Download PDF",
+                            data=pdf_file,
+                            file_name="EDA_Report.pdf",
+                            mime="application/pdf"
+                        )
     
     except Exception as e:
         st.error(f"Error while reading file: {e}")
