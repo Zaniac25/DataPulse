@@ -144,6 +144,16 @@ if uploaded_file is not None:
             for insight in st.session_state.dataset_insights:
                 st.info(insight)
 
+            st.subheader(
+                "Advanced Insights"
+            )
+
+            for insight in (
+                st.session_state.advanced_insights
+            ):
+
+                st.warning(insight)
+
             with st.expander(
                 "Generated EDA Report"
             ):
