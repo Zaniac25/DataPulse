@@ -12,7 +12,9 @@ from analysis import (
 )
 from visualizations import interactive_visualizations, advanced_visualizations
 from profiling import generate_dataset_profile
-from insights import generate_dataset_insights
+from insights import (
+    generate_dataset_insights,
+    generate_advanced_insights)
 from report_generator import generate_eda_report
 from report_export import export_eda_report_pdf
 
@@ -37,6 +39,16 @@ if uploaded_file is not None:
         # Generate Dataset Insights
         insights = generate_dataset_insights(
             profile
+        )
+
+        advanced_insights = (
+            generate_advanced_insights(
+                profile
+            )
+        )
+
+        st.session_state.advanced_insights = (
+            advanced_insights
         )
 
         # Store Insights
