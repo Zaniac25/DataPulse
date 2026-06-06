@@ -130,3 +130,68 @@ def generate_dataset_insights(profile):
         )
 
     return insights
+
+def generate_advanced_insights(profile):
+
+    advanced_insights = []
+
+    # Missing Values
+
+    for col, percent in profile[
+        "missing_percentages"
+    ].items():
+
+        if percent > 40:
+
+            advanced_insights.append(
+                f"Column '{col}' contains "
+                f"{percent}% missing values "
+                f"and should be reviewed."
+            )
+
+        elif percent > 20:
+
+            advanced_insights.append(
+                f"Column '{col}' contains "
+                f"{percent}% missing values."
+            )
+
+    # Outliers
+
+    for col, data in profile[
+        "outlier_summary"
+    ].items():
+
+        if data["percentage"] > 15:
+
+            advanced_insights.append(
+                f"Column '{col}' contains "
+                f"{data['percentage']}% outliers."
+            )
+
+    # Correlations
+
+    for col, corr_data in profile[
+        "correlation_summary"
+    ].items():
+
+        for target, value in corr_data.items():
+
+            advanced_insights.append(
+                f"Strong correlation detected "
+                f"between '{col}' and "
+                f"'{target}' ({value})."
+            )
+
+    # Constant Columns
+
+    for col in profile[
+        "constant_columns"
+    ]:
+
+        advanced_insights.append(
+            f"'{col}' contains only one "
+            f"unique value and may be removed."
+        )
+
+    return advanced_insights
