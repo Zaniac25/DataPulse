@@ -9,3 +9,4 @@ statsmodels
 imblearn
 openpyxl
 reportlab
+google-generativeai
