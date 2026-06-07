@@ -97,3 +97,53 @@ def generate_executive_summary(
     )
 
     return response.text
+
+def generate_cleaning_recommendations(
+        profile,
+        insights,
+        advanced_insights,
+        api_key
+    ):
+
+    model = configure_gemini(
+        api_key
+    )
+
+    prompt = f"""
+        You are a Senior Data Scientist.
+
+        Analyze the dataset information below.
+
+        Dataset Profile:
+        {profile}
+
+        Insights:
+        {insights}
+
+        Advanced Insights:
+        {advanced_insights}
+
+        Generate a Data Cleaning Recommendation Report.
+
+        Include:
+
+        1. Missing Value Handling
+        2. Outlier Treatment
+        3. Duplicate Removal Advice
+        4. Constant Column Detection
+        5. Feature Engineering Suggestions
+        6. Columns That May Need Removal
+        7. Preprocessing Recommendations
+
+        Provide practical recommendations.
+
+        Do not generate code.
+
+        Use clear numbered points.
+        """
+
+    response = model.generate_content(
+        prompt
+    )
+
+    return response.text
