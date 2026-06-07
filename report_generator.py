@@ -1,3 +1,6 @@
+import streamlit as st
+
+@st.cache_data
 def generate_eda_report(profile, insights):
 
     report_sections = {}

@@ -17,6 +17,7 @@ from insights import (
     generate_advanced_insights)
 from report_generator import generate_eda_report
 from report_export import export_eda_report_pdf
+from ai_reports import generate_ai_eda_report
 
 # Title
 st.title("Accidents Analysis Dashboard")
@@ -88,12 +89,6 @@ if uploaded_file is not None:
         
         with tab1:
             dataset_shape(display_df)
-
-            with st.expander("Dataset Profile Debug"):
-                st.json(
-                    st.session_state.dataset_profile
-                )
-
             st.divider()
             dataset_preview(display_df)
             st.divider()
@@ -184,7 +179,48 @@ if uploaded_file is not None:
                             file_name="EDA_Report.pdf",
                             mime="application/pdf"
                         )
-    
+
+            st.subheader(
+                "AI EDA Report"
+            )
+
+            if st.button(
+                "Generate AI Report"
+            ):
+
+                try:
+
+                    with st.spinner(
+                        "Generating AI Report..."
+                    ):
+
+                        st.session_state.ai_report = (
+                            generate_ai_eda_report(
+                                st.session_state.dataset_profile,
+                                st.session_state.dataset_insights,
+                                st.session_state.advanced_insights,
+                                st.secrets["GEMINI_API_KEY"]
+                            )
+                        )
+
+                except Exception as e:
+
+                    st.error(
+                        f"AI Report Error: {e}"
+                    )
+
+            if (
+                "ai_report" in st.session_state
+                and
+                st.session_state.ai_report
+            ):
+
+                st.markdown(
+                    st.session_state.ai_report
+                )
+
+            
+
     except Exception as e:
         st.error(f"Error while reading file: {e}")
 

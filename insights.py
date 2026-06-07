@@ -1,3 +1,6 @@
+import streamlit as st
+
+@st.cache_data
 def generate_dataset_insights(profile):
 
     insights = []
@@ -131,8 +134,8 @@ def generate_dataset_insights(profile):
 
     return insights
 
+@st.cache_data
 def generate_advanced_insights(profile):
-
     advanced_insights = []
 
     # Missing Values

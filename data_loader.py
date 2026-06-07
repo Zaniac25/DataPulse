@@ -26,9 +26,17 @@ def initialize_session_state(df, file_name):
     if "original_df" not in st.session_state:
         st.session_state.original_df = df.copy()
     
-    if "working_df" not in st.session_state or st.session_state.get("current_file") != file_name:
+    if (
+        "working_df" not in st.session_state
+        or
+        st.session_state.get("current_file") != file_name
+    ):
+
         st.session_state.working_df = df.copy()
         st.session_state.current_file = file_name
+
+        if "ai_report" in st.session_state:
+            del st.session_state["ai_report"]
     
     if "cleaning_completed" not in st.session_state:
         st.session_state.cleaning_completed = False
