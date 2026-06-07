@@ -17,7 +17,10 @@ from insights import (
     generate_advanced_insights)
 from report_generator import generate_eda_report
 from report_export import export_eda_report_pdf
-from ai_reports import generate_ai_eda_report
+from ai_reports import (
+    generate_ai_eda_report,
+    generate_executive_summary
+)
 
 # Title
 st.title("Accidents Analysis Dashboard")
@@ -218,6 +221,45 @@ if uploaded_file is not None:
                 st.markdown(
                     st.session_state.ai_report
                 )
+
+            st.subheader(
+                "Executive Summary"
+            )
+
+            if st.button(
+                "Generate Executive Summary"
+            ):
+
+                try:
+
+                    with st.spinner(
+                        "Generating Executive Summary..."
+                    ):
+
+                        st.session_state.executive_summary = (
+                            generate_executive_summary(
+                                st.session_state.dataset_profile,
+                                st.session_state.dataset_insights,
+                                st.session_state.advanced_insights,
+                                st.secrets["GEMINI_API_KEY"]
+                            )
+                        )
+
+                except Exception as e:
+
+                    st.error(
+                        f"Executive Summary Error: {e}"
+                    )
+
+                if (
+                    "executive_summary" in st.session_state
+                    and
+                    st.session_state.executive_summary
+                ):
+
+                    st.markdown(
+                        st.session_state.executive_summary
+                    )
 
             
 
