@@ -53,3 +53,47 @@ def generate_ai_eda_report(
     )
 
     return response.text
+
+def generate_executive_summary(
+        profile,
+        insights,
+        advanced_insights,
+        api_key
+    ):
+
+    model = configure_gemini(
+        api_key
+    )
+
+    prompt = f"""
+        You are a Senior Business Analyst.
+
+        Generate an Executive Summary.
+
+        Dataset Profile:
+        {profile}
+
+        Insights:
+        {insights}
+
+        Advanced Insights:
+        {advanced_insights}
+
+        Provide:
+
+        1. Overall Dataset Quality
+        2. Key Findings
+        3. Major Risks
+        4. Recommended Actions
+        5. Final Verdict
+
+        Keep the report concise and business-friendly.
+
+        Maximum 300 words.
+        """
+
+    response = model.generate_content(
+        prompt
+    )
+
+    return response.text
