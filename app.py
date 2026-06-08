@@ -19,12 +19,13 @@ from insights import (
 from report_generator import generate_eda_report
 from report_export import (
     export_eda_report_pdf,
-    export_text_report_pdf
+    export_text_report_pdf,
+    export_full_report_pdf
 )
 from ai_reports import (
     generate_ai_eda_report,
     generate_executive_summary,
-    generate_cleaning_recommendations
+    generate_cleaning_recommendations,
 )
 
 # Title
@@ -377,7 +378,42 @@ if uploaded_file is not None:
                             "application/pdf"
                         )
 
+            if (
+                "ai_report" in st.session_state
+                and
+                "executive_summary" in st.session_state
+                and
+                "cleaning_report" in st.session_state
+            ):
             
+                st.subheader(
+                    "Full Analysis Report"
+                )
+
+                if st.button(
+                    "Generate Full Report PDF"
+                ):
+
+                    pdf_path = (
+                        export_full_report_pdf(
+                            st.session_state.eda_report,
+                            st.session_state.ai_report,
+                            st.session_state.executive_summary,
+                            st.session_state.cleaning_report
+                        )
+                    )
+
+                    with open(
+                        pdf_path,
+                        "rb"
+                    ) as pdf_file:
+
+                        st.download_button(
+                            "Download Full Report PDF",
+                            pdf_file,
+                            "Full_Analysis_Report.pdf",
+                            "application/pdf"
+                        )
 
     except Exception as e:
         st.error(f"Error while reading file: {e}")
