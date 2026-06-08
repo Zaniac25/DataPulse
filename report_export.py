@@ -52,3 +52,43 @@ def export_eda_report_pdf(
     doc.build(elements)
 
     return output_path
+
+
+def export_text_report_pdf(
+        title,
+        content,
+        output_path
+    ):
+
+    doc = SimpleDocTemplate(
+        output_path
+    )
+
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    elements.append(
+        Paragraph(
+            title,
+            styles["Title"]
+        )
+    )
+
+    elements.append(
+        Spacer(1, 12)
+    )
+
+    elements.append(
+        Paragraph(
+            str(content).replace(
+                "\n",
+                "<br/>"
+            ),
+            styles["BodyText"]
+        )
+    )
+
+    doc.build(elements)
+
+    return output_path
