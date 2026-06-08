@@ -19,7 +19,8 @@ from report_generator import generate_eda_report
 from report_export import export_eda_report_pdf
 from ai_reports import (
     generate_ai_eda_report,
-    generate_executive_summary
+    generate_executive_summary,
+    generate_cleaning_recommendations
 )
 
 # Title
@@ -259,6 +260,45 @@ if uploaded_file is not None:
 
                     st.markdown(
                         st.session_state.executive_summary
+                    )
+
+            st.subheader(
+                "Cleaning Recommendation Report"
+            )
+
+            if st.button(
+                "Generate Cleaning Recommendations"
+            ):
+
+                try:
+
+                    with st.spinner(
+                        "Generating Recommendations..."
+                    ):
+
+                        st.session_state.cleaning_report = (
+                            generate_cleaning_recommendations(
+                                st.session_state.dataset_profile,
+                                st.session_state.dataset_insights,
+                                st.session_state.advanced_insights,
+                                st.secrets["GEMINI_API_KEY"]
+                            )
+                        )
+
+                except Exception as e:
+
+                    st.error(
+                        f"Cleaning Report Error: {e}"
+                    )
+
+                if (
+                    "cleaning_report" in st.session_state
+                    and
+                    st.session_state.cleaning_report
+                ):
+
+                    st.markdown(
+                        st.session_state.cleaning_report
                     )
 
             
