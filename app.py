@@ -14,9 +14,13 @@ from visualizations import interactive_visualizations, advanced_visualizations
 from profiling import generate_dataset_profile
 from insights import (
     generate_dataset_insights,
-    generate_advanced_insights)
+    generate_advanced_insights
+)
 from report_generator import generate_eda_report
-from report_export import export_eda_report_pdf
+from report_export import (
+    export_eda_report_pdf,
+    export_text_report_pdf
+)
 from ai_reports import (
     generate_ai_eda_report,
     generate_executive_summary,
@@ -213,15 +217,39 @@ if uploaded_file is not None:
                         f"AI Report Error: {e}"
                     )
 
-            if (
-                "ai_report" in st.session_state
-                and
-                st.session_state.ai_report
-            ):
-
-                st.markdown(
+                if (
+                    "ai_report" in st.session_state
+                    and
                     st.session_state.ai_report
-                )
+                ):
+
+                    st.markdown(
+                        st.session_state.ai_report
+                    )
+
+                if st.button(
+                    "Generate AI Report PDF"
+                ):
+
+                    pdf_path = (
+                        export_text_report_pdf(
+                            "AI EDA Report",
+                            st.session_state.ai_report,
+                            "ai_report.pdf"
+                        )
+                    )
+
+                    with open(
+                        pdf_path,
+                        "rb"
+                    ) as pdf_file:
+
+                        st.download_button(
+                            "Download AI Report PDF",
+                            pdf_file,
+                            "AI_Report.pdf",
+                            "application/pdf"
+                        )
 
             st.subheader(
                 "Executive Summary"
@@ -262,6 +290,30 @@ if uploaded_file is not None:
                         st.session_state.executive_summary
                     )
 
+                if st.button(
+                    "Generate Executive Summary PDF"
+                ):
+
+                    pdf_path = (
+                        export_text_report_pdf(
+                            "Executive Summary",
+                            st.session_state.executive_summary,
+                            "executive_summary.pdf"
+                        )
+                    )
+
+                    with open(
+                        pdf_path,
+                        "rb"
+                    ) as pdf_file:
+
+                        st.download_button(
+                            "Download Executive Summary PDF",
+                            pdf_file,
+                            "Executive_Summary.pdf",
+                            "application/pdf"
+                        )
+
             st.subheader(
                 "Cleaning Recommendation Report"
             )
@@ -300,6 +352,30 @@ if uploaded_file is not None:
                     st.markdown(
                         st.session_state.cleaning_report
                     )
+
+                if st.button(
+                    "Generate Cleaning Report PDF"
+                ):
+
+                    pdf_path = (
+                        export_text_report_pdf(
+                            "Cleaning Recommendation Report",
+                            st.session_state.cleaning_report,
+                            "cleaning_report.pdf"
+                        )
+                    )
+
+                    with open(
+                        pdf_path,
+                        "rb"
+                    ) as pdf_file:
+
+                        st.download_button(
+                            "Download Cleaning Report PDF",
+                            pdf_file,
+                            "Cleaning_Report.pdf",
+                            "application/pdf"
+                        )
 
             
 
