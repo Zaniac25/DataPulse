@@ -92,3 +92,76 @@ def export_text_report_pdf(
     doc.build(elements)
 
     return output_path
+
+def export_full_report_pdf(
+        eda_report,
+        ai_report,
+        executive_summary,
+        cleaning_report,
+        output_path="full_report.pdf"
+    ):
+
+    doc = SimpleDocTemplate(
+        output_path
+    )
+
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    sections = [
+        (
+            "EDA Report",
+            str(eda_report)
+        ),
+        (
+            "AI EDA Report",
+            ai_report
+        ),
+        (
+            "Executive Summary",
+            executive_summary
+        ),
+        (
+            "Cleaning Recommendations",
+            cleaning_report
+        )
+    ]
+
+    elements.append(
+        Paragraph(
+            "Full Data Analysis Report",
+            styles["Title"]
+        )
+    )
+
+    elements.append(
+        Spacer(1, 12)
+    )
+
+    for title, content in sections:
+
+        elements.append(
+            Paragraph(
+                title,
+                styles["Heading2"]
+            )
+        )
+
+        elements.append(
+            Paragraph(
+                str(content).replace(
+                    "\n",
+                    "<br/>"
+                ),
+                styles["BodyText"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 12)
+        )
+
+    doc.build(elements)
+
+    return output_path
